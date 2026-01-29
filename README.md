@@ -129,6 +129,125 @@ CREATE TABLE users (
 );
 ```
 
+## Security: Locking Down Host and Container with iptables
+
+When exposing this container to the internet, it's important to restrict both host access and container outbound traffic. The following setup uses iptables with the `DOCKER-USER` chain to control container networking while securing the host.
+
+### Prerequisites
+
+Install iptables-persistent to save rules across reboots:
+
+```bash
+sudo apt update
+sudo apt install iptables-persistent
+```
+
+### Firewall Configuration Script
+
+Create and run this script to configure iptables rules:
+
+```bash
+#!/bin/bash
+# ==========================================================
+# Combined iptables rules for Docker traffic + Host lockdown
+# ==========================================================
+
+# Make sure Docker is running to create its chains
+sudo systemctl start docker
+sleep 2  # Give Docker time to set up its chains
+
+# -------------------------------
+# 1. Create and reset DOCKER-USER chain
+# -------------------------------
+# This chain exists when Docker is running
+if sudo iptables -L DOCKER-USER -n &>/dev/null; then
+    sudo iptables -F DOCKER-USER
+else
+    echo "ERROR: DOCKER-USER chain doesn't exist. Make sure Docker is running."
+    exit 1
+fi
+
+# -------------------------------
+# 2. Set default policies
+# -------------------------------
+# Host default policies: drop everything by default
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD ACCEPT   # Keep FORWARD open for Docker
+sudo iptables -P OUTPUT ACCEPT    # Allow host to make outbound connections
+
+# -------------------------------
+# 3. Host-level INPUT rules (traffic destined for the host)
+# -------------------------------
+# Flush existing INPUT chain rules
+sudo iptables -F INPUT
+
+# Accept loopback (localhost) traffic
+sudo iptables -A INPUT -i lo -j ACCEPT
+
+# Accept established and related connections
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Allow SSH to the host (port 22)
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Allow HTTP to the host (port 80)
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+# Drop all other inbound traffic to host (already handled by default policy, but explicit is nice)
+sudo iptables -A INPUT -j DROP
+
+# -------------------------------
+# 4. DOCKER-USER chain (container-specific rules)
+# -------------------------------
+# Allow established and related connections in DOCKER-USER chain
+sudo iptables -A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# Allow DNS from containers (UDP port 53)
+sudo iptables -A DOCKER-USER -i docker0 -p udp --dport 53 -j ACCEPT
+
+# Allow NTP from containers (UDP port 123)
+sudo iptables -A DOCKER-USER -i docker0 -p udp --dport 123 -j ACCEPT
+
+# Allow outbound connections to specific IP ranges and ports
+# Customize these for your MUD server(s)
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4000 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4001 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4002 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4000 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4001 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4002 -j ACCEPT
+
+# Drop all other outbound traffic from docker0
+sudo iptables -A DOCKER-USER -i docker0 -j DROP
+
+# -------------------------------
+# 5. Save rules (Ubuntu persistent)
+# -------------------------------
+sudo netfilter-persistent save
+sudo netfilter-persistent reload
+```
+
+### What This Configuration Does
+
+**Host Protection:**
+- Drops all incoming traffic by default
+- Allows SSH (port 22) and HTTP (port 80) only
+- Permits established/related connections and localhost traffic
+
+**Container Restrictions:**
+- Allows DNS (port 53/UDP) and NTP (port 123/UDP) for basic functionality
+- Restricts outbound connections to specific MUD server IPs and ports
+- Drops all other outbound traffic from containers
+
+### Customization
+
+Modify the `DOCKER-USER` rules to allow your MUD server(s):
+
+```bash
+# Add rules for your MUD server IP and port
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d YOUR.MUD.IP.ADDRESS --dport YOUR_PORT -j ACCEPT
+```
+
 ## License
 
 This project is licensed under the **GNU General Public License v3.0** (GPL-3.0).
