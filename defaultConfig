@@ -1,0 +1,19 @@
+#config speedwalk on
+#tick {resplitScreen} {#split} {10}
+
+#alias {welcomenotice}  {welcomenotice1;welcomenotice2;welcomenotice3;welcomenotice4;welcomenotice5}
+#alias {welcomenotice1} {#show Welcome to the Nukefire tintin++ service}
+#alias {welcomenotice2}  {#show {\r};#show You can enter the command '<169>ses1<099>' to connect to <fca>NukeFire<099> and begin playing;#show {\r}}
+#alias {welcomenotice3}  {#show You can also use '<169>ses2<099>', '<169>ses3<099>', '<169>ses4<099>' to connect up to 4 players}
+#alias {welcomenotice4}  {#show The fine folks at mudhalla have good documentation available at <169>https://tintin.mudhalla.net/manual/session.php<099>}
+#alias {welcomenotice5}  {#show {\r};#show If you make any custom aliases/actions for the game, typing '<169>save<099>' will make them available on your next visit.}
+
+#alias {ses1} {#session {ses1} {tdome.nukefire.org} {4000};#split}
+#alias {ses2} {#session {ses2} {tdome.nukefire.org} {4000};#split}
+#alias {ses3} {#session {ses3} {tdome.nukefire.org} {4000};#split}
+#alias {ses4} {#session {ses4} {tdome.nukefire.org} {4000};#split}
+
+#event {SESSION DISCONNECTED} {#gts #delay 0.01 welcomenotice}
+
+#screen clear all
+welcomenotice

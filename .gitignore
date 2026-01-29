@@ -1,0 +1,16 @@
+# Docker authentication
+.docker/
+
+# Shell history and user files
+.bash_history
+.bashrc
+.bash_logout
+.profile
+.viminfo
+.lesshst
+.cache/
+.sudo_as_admin_successful
+
+# Claude Code files
+.claude/
+CLAUDE.md

@@ -1,0 +1,1347 @@
+/******************************************************************************
+*   This file is part of TinTin++                                             *
+*                                                                             *
+*   Copyright 2004-2020 Igor van den Hoven                                    *
+*                                                                             *
+*   TinTin++ is free software; you can redistribute it and/or modify          *
+*   it under the terms of the GNU General Public License as published by      *
+*   the Free Software Foundation; either version 3 of the License, or         *
+*   (at your option) any later version.                                       *
+*                                                                             *
+*   This program is distributed in the hope that it will be useful,           *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+*   GNU General Public License for more details.                              *
+*                                                                             *
+*   You should have received a copy of the GNU General Public License         *
+*   along with TinTin++.  If not, see https://www.gnu.org/licenses.           *
+******************************************************************************/
+
+/******************************************************************************
+*                               T I N T I N + +                               *
+*                                                                             *
+*                      coded by Igor van den Hoven 2004                       *
+******************************************************************************/
+
+#include "tintin.h"
+
+#define DO_CONFIG(config)    struct session *config (struct session *ses, char *arg1, char *arg2, int index)
+
+DO_CONFIG(config_autotab);
+DO_CONFIG(config_buffersize);
+DO_CONFIG(config_charset);
+DO_CONFIG(config_colormode);
+DO_CONFIG(config_colorpatch);
+DO_CONFIG(config_commandcolor);
+DO_CONFIG(config_commandecho);
+DO_CONFIG(config_compact);
+DO_CONFIG(config_connectretry);
+DO_CONFIG(config_childlock);
+DO_CONFIG(config_convertmeta);
+DO_CONFIG(config_debugtelnet);
+DO_CONFIG(config_historysize);
+DO_CONFIG(config_hibernate);
+DO_CONFIG(config_inheritance);
+DO_CONFIG(config_loglevel);
+DO_CONFIG(config_logmode);
+DO_CONFIG(config_mccp);
+DO_CONFIG(config_mousetracking);
+DO_CONFIG(config_packetpatch);
+DO_CONFIG(config_randomseed);
+DO_CONFIG(config_repeatchar);
+DO_CONFIG(config_repeatenter);
+DO_CONFIG(config_screenreader);
+DO_CONFIG(config_scrolllock);
+DO_CONFIG(config_speedwalk);
+DO_CONFIG(config_tabwidth);
+DO_CONFIG(config_telnet);
+DO_CONFIG(config_tintinchar);
+DO_CONFIG(config_verbatim);
+DO_CONFIG(config_verbatimchar);
+DO_CONFIG(config_verbose);
+DO_CONFIG(config_wordwrap);
+
+typedef struct session *CONFIG  (struct session *ses, char *arg1, char *arg2, int index);
+
+struct config_type
+{
+	char                  * name;
+	char                  * msg_on;
+	char                  * msg_off;
+	CONFIG                * config;
+};
+
+struct config_type config_table[] =
+{
+	{
+		"AUTO TAB",
+		"Buffer lines used for tab completion",
+		"",
+		config_autotab
+	},
+
+	{
+		"BUFFER SIZE",
+		"The size of the scrollback buffer",
+		"",
+		config_buffersize
+	},
+
+	{
+		"CHARSET",
+		"The character set encoding used",
+		"",
+		config_charset
+	},
+
+	{
+		"CHILD LOCK",
+		"TinTin++ is child locked.",
+		"TinTin++ is not child locked.",
+		config_childlock
+	},
+
+	{
+		"COLOR MODE",
+		"The color code encoding used",
+		"",
+		config_colormode
+	},
+
+	{
+		"COLOR PATCH",
+		"Color the start of each line",
+		"Leave color handling up to the server",
+		config_colorpatch
+	},
+
+	{
+		"COMMAND COLOR",
+		"The color of echoed commands",
+		"",
+		config_commandcolor
+	},
+
+	{
+		"COMMAND ECHO",
+		"Commands are echoed in split mode",
+		"Commands are not echoed in split mode",
+		config_commandecho
+	},
+
+	{
+		"COMPACT",
+		"Remove blank prompt lines",
+		"Do not remove blank prompt lines",
+		config_compact
+	},
+
+	{
+		"CONNECT RETRY",
+		"Seconds sessions try to connect on failure",
+		"",
+		config_connectretry
+	},
+
+	{
+		"CONVERT META",
+		"TinTin++ converts meta characters",
+		"TinTin++ doesn't convert meta characters",
+		config_convertmeta
+	},
+
+	{
+		"DEBUG TELNET",
+		"You see telnet negotiations",
+		"You do not see telnet negotatiations",
+		config_debugtelnet
+	},
+
+	{
+		"HIBERNATE",
+		"Go into low CPU usage mode",
+		"",
+		config_hibernate
+	},
+
+	{
+		"HISTORY SIZE",
+		"The size of the command history",
+		"",
+		config_historysize
+	},
+
+	{
+		"INHERITANCE",
+		"The startup session is inherited",
+		"The startup session is not inherited",
+		config_inheritance
+	},
+
+	{
+		"LOG MODE",
+		"The data type mode of log files",
+		"",
+		config_logmode
+	},
+
+	{
+		"LOG LEVEL",
+		"TinTin++ only logs low level server data",
+		"TinTin++ only logs high level server data",
+		config_loglevel
+	},
+
+	{
+		"MCCP",
+		"MCCP is enabled.",
+		"MCCP is disabled.",
+		config_mccp
+	},
+
+	{
+		"MOUSE",
+		"Generate mouse tracking events.",
+		"Do not generate mouse events.",
+		config_mousetracking
+	},
+
+	{
+		"PACKET PATCH",
+		"Seconds to try to patch broken packets",
+		"",
+		config_packetpatch
+	},
+
+	{
+		"RANDOM SEED",
+		"Seed value used for random numbers",
+		"",
+		config_randomseed
+	},
+
+	{
+		"REPEAT CHAR",
+		"Character used for repeating commands",
+		"",
+		config_repeatchar
+	},
+
+	{
+		"REPEAT ENTER",
+		"You send the last command on an enter",
+		"You send a carriage return on an enter",
+		config_repeatenter
+	},
+
+	{
+		"SCREEN READER",
+		"You are using a screen reader",
+		"You are not using a screen reader",
+		config_screenreader
+	},
+
+	{
+		"SCROLL LOCK",
+		"You do not see server output while scrolling",
+		"You see server output while scrolling",
+		config_scrolllock
+	},
+
+	{
+		"SPEEDWALK",
+		"Your input is scanned for speedwalks",
+		"Your input is not scanned for speedwalks",
+		config_speedwalk
+	},
+
+	{
+		"TAB WIDTH",
+		"Number of spaces used for a tab",
+		"",
+		config_tabwidth
+	},
+
+	{
+		"TELNET",
+		"TELNET support is enabled.",
+		"TELNET support is disabled.",
+		config_telnet
+	},
+
+	{
+		"TINTIN CHAR",
+		"Character used for TinTin++ commands",
+		"",
+		config_tintinchar
+	},
+
+	{
+		"VERBATIM",
+		"Keyboard input is send as is",
+		"Keyboard input is parsed by TinTin++",
+		config_verbatim
+	},
+
+	{
+		"VERBATIM CHAR",
+		"Character used for verbatim lines",
+		"",
+		config_verbatimchar
+	},
+
+	{
+		"VERBOSE",
+		"Read script files verbosely",
+		"Read script files quietly",
+		config_verbose
+	},
+
+	{
+		"WORDWRAP",
+		"Server output is word wrapped",
+		"Server output is line wrapped",
+		config_wordwrap
+	},
+
+
+	{
+		"",
+		"",
+		0,
+		0
+	}
+};
+
+DO_COMMAND(do_configure)
+{
+	struct listnode *node;
+	int index;
+
+	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
+	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
+
+	if (*arg1 == 0)
+	{
+		tintin_header(ses, 80, " CONFIGURATIONS ");
+
+		for (index = 0 ; *config_table[index].name != 0 ; index++)
+		{
+			node = search_node_list(ses->list[LIST_CONFIG], config_table[index].name);
+
+			if (node)
+			{
+				strcpy(arg2, "");
+
+				config_table[index].config(ses, arg1, arg2, index);
+
+				tintin_printf2(ses, "[%-14s] [%12s] %s",
+					node->arg1,
+					arg2,
+					strcmp(node->arg2, "OFF") ? config_table[index].msg_on : config_table[index].msg_off);
+			}
+		}
+
+		tintin_header(ses, 80, "");
+	}
+	else
+	{
+		// fixing silly config name
+
+		if (is_abbrev(arg1, "MOUSE TRACKING"))
+		{
+			str_cpy(&arg1, "MOUSE");
+		}
+
+		for (index = 0 ; *config_table[index].name != 0 ; index++)
+		{
+			if (is_abbrev(arg1, config_table[index].name))
+			{
+				if (*arg2)
+				{
+					if (config_table[index].config(ses, arg1, arg2, index) != NULL)
+					{
+						update_node_list(ses->list[LIST_CONFIG], config_table[index].name, arg2, "", "");
+
+						node = search_node_list(ses->list[LIST_CONFIG], config_table[index].name);
+
+						if (node)
+						{
+							check_all_events(ses, EVENT_FLAG_SYSTEM, 0, 2, "CONFIG", config_table[index].name, node->arg2);
+
+							show_message(ses, LIST_CONFIG, "#CONFIG {%s} HAS BEEN SET TO {%s}.", config_table[index].name, node->arg2);
+						}
+					}
+				}
+				else
+				{
+					config_table[index].config(ses, arg1, arg2, index);
+
+					show_message(ses, LIST_CONFIG, "#CONFIG {%s} IS SET TO {%s}.", config_table[index].name, arg2);
+				}
+				return ses;
+			}
+		}
+		show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s} IS NOT A VALID OPTION.", capitalize(arg1));
+	}
+	return ses;
+}
+
+DO_CONFIG(config_autotab)
+{
+	if (*arg2)
+	{
+		if (!is_number(arg2) || atoi(arg2) < 1 || atoi(arg2) > 999999)
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s} {%s}: PROVIDE A NUMBER BETWEEN 1 and 999999.", config_table[index].name, arg2);
+
+			return NULL;
+		}
+
+		ses->scrollback_tab = atoi(arg2);
+	}
+	sprintf(arg2, "%d", ses->scrollback_tab);
+
+	return ses;
+}
+
+
+DO_CONFIG(config_buffersize)
+{
+	if (*arg2)
+	{
+		if (!is_number(arg2))
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <NUMBER>", config_table[index].name);
+
+			return NULL;
+		}
+
+		switch (atoi(arg2))
+		{
+			case 100:
+			case 1000:
+			case 10000:
+			case 100000:
+			case 1000000:
+				break;
+
+			default:
+				show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {BUFFER SIZE}: SIZE MUST BE 100, 1000, 10000, 100000, or 1000000.");
+				return NULL;
+		}
+		init_buffer(ses, atoi(arg2));
+	}
+	sprintf(arg2, "%d", ses->scroll->size);
+
+	return ses;
+}
+
+DO_CONFIG(config_charset)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "AUTO"))
+		{
+			if (strcasestr(gtd->system->lang, "UTF-8"))
+			{
+				DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+				SET_BIT(ses->charset, CHARSET_FLAG_UTF8);
+			}
+			else if (strcasestr(gtd->system->lang, "BIG-5"))
+			{
+				DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+				SET_BIT(ses->charset, CHARSET_FLAG_BIG5);
+			}
+			else if (strcasestr(gtd->system->term, "XTERM"))
+			{
+				DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+				SET_BIT(ses->charset, CHARSET_FLAG_UTF8);
+			}
+			else
+			{
+				DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+			}
+		}
+		else
+		{
+			for (index = 0 ; *charset_table[index].name ; index++)
+			{
+				if (is_abbrev(arg2, charset_table[index].name))
+				{
+					break;
+				}
+			}
+
+			if (*charset_table[index].name == 0)
+			{
+				show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {CHARSET} {AUTO|ASCII|BIG-5|BIG5TOUTF8|CP437TOUTF8|CP949|CP949TOUTF8|CP1251TOUTF8|GBK-1|GBK1TOUTF8|ISO1TOUTF8|ISO2TOUTF8|KOI8TOUTF8|UTF-8}");
+
+				return NULL;
+			}
+
+			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+
+			SET_BIT(ses->charset, charset_table[index].flags);
+		}
+	}
+
+	for (index = 0 ; *charset_table[index].name ; index++)
+	{
+		if (ses->charset == charset_table[index].flags)
+		{
+			break;
+		}
+	}
+
+	if (*charset_table[index].name == 0)
+	{
+		show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {CHARSET}: INVALID FLAG: %d.", ses->charset);
+
+		return NULL;
+	}
+
+	strcpy(arg2, charset_table[index].name);
+
+	return ses;
+}
+
+DO_CONFIG(config_childlock)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_colormode)
+{
+	if (*arg2)
+	{	
+		if (is_abbrev(arg2, "NONE") || is_abbrev(arg2, "OFF"))
+		{
+			ses->color = 0;
+		}
+		else if (is_abbrev(arg2, "REVERSE"))
+		{
+			ses->color = 0;
+			printf("\e[30m");
+		}
+		else if (is_abbrev(arg2, "ANSI"))
+		{
+			ses->color = 16;
+		}
+		else if (is_abbrev(arg2, "256"))
+		{
+			ses->color = 256;
+		}
+		else if (is_abbrev(arg2, "TRUE") || is_abbrev(arg2, "ON") || is_abbrev(arg2, "AUTO"))
+		{
+			ses->color = 4096;
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF|ANSI|256|TRUE}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, ses->color == 0 ? "OFF" : ses->color == 16 ? "ANSI" : ses->color == 256 ? "256" : "TRUE");
+
+	return ses;
+}
+
+DO_CONFIG(config_colorpatch)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_COLORPATCH);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_COLORPATCH);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_COLORPATCH) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_commandcolor)
+{
+	if (*arg2)
+	{
+		get_color_names(ses, arg2, arg1);
+
+		RESTRING(ses->cmd_color, arg1);
+	}
+	convert_meta(ses->cmd_color, arg2, SUB_EOL);
+
+	return ses;
+}
+
+DO_CONFIG(config_commandecho)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_ECHOCOMMAND);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_ECHOCOMMAND);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_ECHOCOMMAND) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_compact)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_COMPACT);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_COMPACT);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_COMPACT) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_connectretry)
+{
+	if (*arg2)
+	{
+		if (!is_number(arg2))
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <NUMBER>", config_table[index].name);
+
+			return NULL;
+		}
+		else if (atof(arg2) < 0 || atof(arg2) > 10000)
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {CONNECT RETRY}: PROVIDE A NUMBER BETWEEN 0.0 and 10000.");
+
+			return NULL;
+		}
+		gts->connect_retry = atoll(arg2) * 1000000LL;
+	}
+
+	snprintf(arg2, BUFFER_SIZE, "%.1Lf", (long double) gts->connect_retry / 1000000);
+
+	return ses;
+}
+
+DO_CONFIG(config_convertmeta)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_CONVERTMETA);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_CONVERTMETA);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_CONVERTMETA) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_debugtelnet)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->telopts, TELOPT_FLAG_DEBUG) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_historysize)
+{
+	if (*arg2)
+	{
+		if (!is_number(arg2))
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <NUMBER>", config_table[index].name);
+
+			return NULL;
+		}
+
+		if (atoi(arg2) < 0 || atoi(arg2) > 9999)
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s}: PROVIDE A NUMBER BETWEEN 0 and 9999.", config_table[index].name);
+
+			return NULL;
+		}
+
+		gtd->history_size = atoi(arg2);
+	}
+	sprintf(arg2, "%d", gtd->history_size);
+
+	return ses;
+}
+
+DO_CONFIG(config_hibernate)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(gtd->flags, TINTIN_FLAG_HIBERNATE);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(gtd->flags, TINTIN_FLAG_HIBERNATE);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(gtd->flags, TINTIN_FLAG_HIBERNATE) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_inheritance)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(gtd->flags, TINTIN_FLAG_INHERITANCE);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(gtd->flags, TINTIN_FLAG_INHERITANCE);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(gtd->flags, TINTIN_FLAG_INHERITANCE) ? "ON" : "OFF");
+
+	return ses;
+}
+
+
+DO_CONFIG(config_loglevel)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "LOW"))
+		{
+			SET_BIT(ses->log->mode, LOG_FLAG_LOW);
+		}
+		else if (is_abbrev(arg2, "HIGH"))
+		{
+			DEL_BIT(ses->log->mode, LOG_FLAG_LOW);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {LOW|HIGH}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->log->mode, LOG_FLAG_LOW) ? "LOW" : "HIGH");
+
+	return ses;
+}
+
+
+DO_CONFIG(config_logmode)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "HTML"))
+		{
+			SET_BIT(ses->log->mode, LOG_FLAG_HTML);
+			DEL_BIT(ses->log->mode, LOG_FLAG_PLAIN);
+			DEL_BIT(ses->log->mode, LOG_FLAG_RAW);
+		}
+		else if (is_abbrev(arg2, "PLAIN"))
+		{
+			DEL_BIT(ses->log->mode, LOG_FLAG_HTML);
+			SET_BIT(ses->log->mode, LOG_FLAG_PLAIN);
+			DEL_BIT(ses->log->mode, LOG_FLAG_RAW);
+		}
+		else if (is_abbrev(arg2, "RAW"))
+		{
+			DEL_BIT(ses->log->mode, LOG_FLAG_HTML);
+			DEL_BIT(ses->log->mode, LOG_FLAG_PLAIN);
+			SET_BIT(ses->log->mode, LOG_FLAG_RAW);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {HTML|PLAIN|RAW}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->log->mode, LOG_FLAG_HTML) ? "HTML" : HAS_BIT(ses->log->mode, LOG_FLAG_PLAIN) ? "PLAIN" : HAS_BIT(ses->log->mode, LOG_FLAG_RAW) ? "RAW" : "UNSET" );
+
+	return ses;
+}
+
+
+DO_CONFIG(config_mccp)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_MCCP);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_MCCP);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_MCCP) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_mousetracking)
+{
+	if (*arg2)
+	{
+		DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
+		DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
+		DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);	
+		DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
+		DEL_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+
+		if (is_member(arg2, "DEBUG"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
+			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+		}
+		if (is_member(arg2, "INFO"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
+			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+		}
+		if (is_member(arg2, "ON"))
+		{
+			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+		}
+		if (is_member(arg2, "PIXELS"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
+			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+		}
+
+		if (is_abbrev(arg2, "OFF"))
+		{
+			print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1006l\e[?1016l");
+		}
+		else
+		{
+			if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))
+			{
+				if (HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS))
+				{
+					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1016h");
+				}
+				else
+				{
+					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1006h");
+				}
+			}
+			else
+			{
+				show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF|DEBUG|INFO|PIXELS}", config_table[index].name);
+
+				return NULL;
+			}
+		}
+	}
+
+	if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))
+	{
+		if (!HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG|CONFIG_FLAG_MOUSEINFO|CONFIG_FLAG_MOUSEPIXELS))
+		{
+			strcpy(arg2, "ON");
+		}
+		else
+		{
+			strcpy(arg2, "");
+
+			if (HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS))
+			{
+				strcpy(arg2, "PIXELS");
+			}
+
+			if (HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG))
+			{
+				strcat(arg2, *arg2 ? " DEBUG" : "DEBUG");
+			}
+
+			if (HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO))
+			{
+				strcat(arg2, *arg2 ? " INFO" : "INFO");
+			}
+		}
+	}
+	else
+	{
+		strcpy(arg2, "OFF");
+	}
+	return ses;
+}
+
+
+DO_CONFIG(config_packetpatch)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "AUTO PROMPT") || is_abbrev(arg2, "AUTO TELNET") || is_abbrev(arg2, "AUTO OFF"))
+		{
+			ses->packet_patch = 0;
+
+			SET_BIT(ses->config_flags, CONFIG_FLAG_AUTOPATCH);
+		}
+		else if (!is_number(arg2))
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <NUMBER>", config_table[index].name);
+
+			return NULL;
+		}
+		else if (atof(arg2) < 0 || atof(arg2) > 10)
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {PACKET PATCH}: PROVIDE A NUMBER BETWEEN 0.00 and 10.");
+
+			return NULL;
+		}
+		else
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_AUTOPATCH);
+
+			ses->packet_patch = (unsigned long long) (tintoi(arg2) * 1000000ULL);
+		}
+	}
+
+	if (HAS_BIT(ses->config_flags, CONFIG_FLAG_AUTOPATCH))
+	{
+		if (ses->list[LIST_PROMPT]->list[0])
+		{
+			strcpy(arg2, "AUTO PROMPT");
+		}
+		else if (HAS_BIT(ses->config_flags, CONFIG_FLAG_AUTOPROMPT))
+		{
+			strcpy(arg2, "AUTO TELNET");
+		}
+		else
+		{
+			strcpy(arg2, "AUTO OFF");
+		}
+	}
+	else
+	{
+		snprintf(arg2, BUFFER_SIZE, "%4.2Lf", (long double) ses->packet_patch / 1000000);
+	}
+	return ses;
+}
+
+DO_CONFIG(config_randomseed)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "AUTO"))
+		{
+			seed_rand(ses, ++gtd->utime);
+		}
+		else if (is_number(arg2))
+		{
+			seed_rand(ses, get_number(ses, arg2));
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {AUTO|<NUMBER>}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	sprintf(arg2, "%u", (unsigned int) ses->rand);
+
+	return ses;
+}
+
+DO_CONFIG(config_repeatchar)
+{
+	if (*arg2)
+	{
+		if (!ispunct((int) arg2[0]))
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s}: INVALID CHARACTER {%c}.", config_table[index].name, arg2[0]);
+
+			return NULL;
+		}
+
+		gtd->repeat_char = arg2[0];
+
+		arg2[1] = 0;
+	}
+
+	sprintf(arg2, "%c", gtd->repeat_char);
+
+	return ses;
+}
+
+DO_CONFIG(config_repeatenter)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_REPEATENTER);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_REPEATENTER);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_REPEATENTER) ? "ON" : "OFF");
+
+	return ses;
+}
+
+
+DO_CONFIG(config_screenreader)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_SCREENREADER);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_SCREENREADER);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_SCREENREADER) ? "ON" : "OFF");
+
+	return ses;
+}
+
+
+
+
+DO_CONFIG(config_scrolllock)
+{
+	if (*arg2)
+	{	
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_SCROLLLOCK);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_SCROLLLOCK);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_SCROLLLOCK) ? "ON" : "OFF");	
+
+	return ses;
+}
+
+DO_CONFIG(config_speedwalk)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_SPEEDWALK);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_SPEEDWALK);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_SPEEDWALK) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_tabwidth)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "AUTO"))
+		{
+			ses->tab_width = 8;
+		}
+		else if (!is_number(arg2))
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <NUMBER>", config_table[index].name);
+
+			return NULL;
+		}
+		else if (atof(arg2) < 1 || atof(arg2) > 16)
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {TAB WIDTH}: PROVIDE A NUMBER BETWEEN 1 and 16.");
+
+			return NULL;
+		}
+		else
+		{
+			ses->tab_width = (int) tintoi(arg2);
+		}
+	}
+	sprintf(arg2, "%d", ses->tab_width);
+
+	return ses;
+}
+	
+DO_CONFIG(config_telnet)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			DEL_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+			SET_BIT(ses->config_flags, CONFIG_FLAG_TELNET);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			ses->read_len = 0;
+
+			DEL_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_TELNET);
+		}
+		else if (is_abbrev(arg2, "DEBUG"))
+		{
+			SET_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+			SET_BIT(ses->config_flags, CONFIG_FLAG_TELNET);
+		}
+		else if (is_abbrev(arg2, "INFO"))
+		{
+			SET_BIT(ses->telopts, TELOPT_FLAG_DEBUG);
+			SET_BIT(ses->config_flags, CONFIG_FLAG_TELNET);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF|DEBUG|INFO}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->telopts, TELOPT_FLAG_DEBUG) ? "DEBUG" : HAS_BIT(ses->config_flags, CONFIG_FLAG_TELNET) ? "ON" : "OFF");
+
+	return ses;
+}
+
+
+DO_CONFIG(config_tintinchar)
+{
+	if (*arg2)
+	{
+		if (!ispunct((int) arg2[0]))
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s}: INVALID CHARACTER {%c}.", config_table[index].name, arg2[0]);
+
+			return NULL;
+		}
+
+		gtd->tintin_char = arg2[0];
+	}
+	sprintf(arg2, "%c", gtd->tintin_char);
+
+	return ses;
+}
+
+DO_CONFIG(config_verbatim)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_VERBATIM);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_VERBATIM);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_VERBATIM) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_verbatimchar)
+{
+	if (*arg2)
+	{
+		if (!ispunct((int) arg2[0]))
+		{
+			show_error(ses, LIST_CONFIG, "#ERROR: #CONFIG {%s}: INVALID CHARACTER {%c}.", config_table[index].name, arg2[0]);
+
+			return NULL;
+		}
+		gtd->verbatim_char = arg2[0];
+	}
+	sprintf(arg2, "%c", gtd->verbatim_char);
+
+	return ses;
+}
+
+
+DO_CONFIG(config_verbose)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_VERBOSE);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_VERBOSE);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_VERBOSE) ? "ON" : "OFF");
+
+	return ses;
+}
+
+DO_CONFIG(config_wordwrap)
+{
+	if (*arg2)
+	{
+		if (is_abbrev(arg2, "ON"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_WORDWRAP);
+		}
+		else if (is_abbrev(arg2, "OFF"))
+		{
+			DEL_BIT(ses->config_flags, CONFIG_FLAG_WORDWRAP);
+		}
+		else
+		{
+			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} {ON|OFF}", config_table[index].name);
+
+			return NULL;
+		}
+	}
+	strcpy(arg2, HAS_BIT(ses->config_flags, CONFIG_FLAG_WORDWRAP) ? "ON" : "OFF");
+
+	return ses;
+}

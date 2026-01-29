@@ -1,0 +1,350 @@
+- Problem with restoring true color subs.
+#sub bla {<F00AA00>bla}
+#high blo <118>
+#showme <158>test bli bla blo test
+
+- split screen scrollback setting in #screen
+
+- Make #draw scroll grid table work properly.
+
+- Make sure #config compact also applies to the log file.
+
+- Add an #event that triggers when a function/variable is not found.
+
+- tab completion on input history
+
+- look into handling VARIABLE UPDATE event better
+
+- catch event to handle #map global exceptions
+
+- switch to pcre2
+
+- Add routine to escape 0x00 in port.c RECEIVED DATA event.
+
+- allow a full telnet disable in port.c
+
+- Add message when a substitution exceeds available memory.
+
+- config loglevel medium option
+
+- look into GMCP larger than buffer size
+
+- finish ? : support in #math
+
+- finish create_node()
+
+- Look into #split 1 1 1 1 on termux when hiding / showing keyboard.
+
+- look into invalid { } in MSDP / GMCP handling
+
+- mapper.c FAST handling
+
+- sandbox mode to disable shell integration.
+
+- update telopt_server with MSSP, MTTS and TTYPE changes
+
+- #format %.3s prints two double-width characters.
+
+- fix ctrl-r so it compiles the pcre once.
+
+- #sleep <time>, possibly allow names to cancel or force continuation
+
+- #line escape {variables;functions}
+
+- look into a #debug flag for #class
+
+- Another nice thing would be if there was some flag to make a trigger match newlines as space.
+
+- fix up named delays and undelay
+
+- add a #regex like command for #cursor to update the input line.
+
+- custom mapping for unicode table to set width
+
+- color code for dynamic color ranges
+
+- #MACRO {\cz} {#cursor get t;#var t} does not handle { } in input.
+
+- Look into delete_index_list leaving a table with ->used set to 0 causing #list crashes
+
+- #daemon attach fails under high cpu load
+
+----------------
+  - add shadow session support with access to all events.
+
+  - set_line_screen debug: col = -5 (64) from draw_text(%p,%d,%p,%p,%p)
+  - set_line_screen stack call triggered on android
+
+  - regex101 like regex tester
+
+  - check: #var bla { x};#draw scroll box 1 1 3 40 $bla
+
+  - input spell checking, #cursor display ?
+
+  - Get discworld / aardwolf mxp to work for @sentix
+
+  - look into default input color
+
+  - add ctrl-r support for scrollback
+
+  - Add #event {SESSION CONNECTED} {#command} {5.1} option.
+
+  - TT++ HANDBOOK for meticulous organized details.
+
+  - vertical bar drawing
+
+  - error: cursor_check_line_modified1: 
+  - https://tintin.sourceforge.io/forum/viewtopic.php?f=10&t=2811 (possible
+    issue with initiating input buffer for a new session)
+
+  - finish BUFFER_SIZE replacement.
+
+  - WSL sound, double check soundpack scripts for lag/stutter
+
+  - WSL faq: #system cmd.exe /c start notepad
+
+  - update msdp scripts with #line msdp feature
+
+  - #cursor get word option, maybe get the yank buffer as well.
+
+  - Add a way to set env variables either 1) for the current process, and/or 2) as a parameter to #system (i.e. after fork in the child process).
+
+* STUFF THAT IS PROBABLY GONNA GET DONE
+
+  - #line timeshot to auto destroy a trigger after given interval.
+
+  - make named delays proper delays
+
+  - Finish port proxy support: resizing, input, security
+
+  - look into transparent drawing
+
+  - VT2020
+
+  - mouse enter/leave events on move. hoover/long-press.
+
+  - $var[%*][%*] support.
+
+  - better #draw font support
+
+  - tab completion on directory structure.
+
+  - #map area command to list room counts per area.
+  - direction field for exits that allow longer than 1x1x1 x/y/z jumps.
+  - global mapper flag that would imply "Hide" on all exits that change area.
+  - multiple global exit rooms and noglobal flags.
+  - auto align routine that inserts void rooms where needed
+  - look into writing script to drag rooms + void with mouse
+  - Store the map filename to differentiate between maps.
+  - #map list {<exits>} breaks on rooms that have e mapped to eu.
+  - finish landmarks
+  - map sandbox mode support (flags to disable saving?)
+  - add ghosting to fix #map flag nofollow exit cmd issues?
+  - Request: 'stop' #map center command, so i could see how the 'user' moves, rather map moves around him? 
+  - make map spacing easier
+  - event for failed #map move.
+  - look into #send triggering follow map.
+  - add {roomdata} search to #map list
+  - change 'C' to 'S' in map file
+
+  - Make actions with a priority of 0. trigger always
+
+  - #draw table {1;2;3;4} {a;b;c;d}
+    #draw scrollbar
+    #draw graph
+    #draw button
+    #draw titanic
+
+  - Make { match both a { and \x7B as it's an annoying issue to debug.
+
+  - Add VT100 filter to make outside sources respect terminal size constraints, also needed to run bash in vsplit mode.
+
+  - Remote script loading
+
+  - add class specific debug
+  - better class event and class size handling ?
+
+  - more potent long-click handling including held down ticks.
+
+  - look into discord api / arachnos
+
+  - Add SESSIONS to the list table.
+
+  - Add debugger to syntax highlighter, substitution highlighing, 256 color support, and variable expansion.
+
+  - add packets patched counter
+
+  - reportable_sounds
+
+  - TELNET documentation.
+
+  - Add JSON support to #scan
+
+  - see if #break 2 is possible, maybe #continue 2 as well.
+
+  - IPv6 for chat
+
+  - See about adding ~/ handling for file names.
+
+--------------------------------------------------------------------------------
+
+* LOW PRIORITY
+
+  - ./configure might error on /dev/ptmx
+
+  - Add a file handler.
+
+  - multi-line buffer searches / captures / deletes
+
+  - add color based auto unwrap routine.
+
+  - add #history filter option to filter out 1 letter commands.
+
+  - Look into config option to change the working directory
+
+--------------------------------------------------------------------------------
+
+* ROADMAP
+
+  - dictionary +tabbing
+
+  - editor
+
+  - clickable link support
+
+  - tintin commander
+
+  - sixel graphics
+
+  - windowing
+
+  - blind automapping
+
+  - better attach/detach
+
+  - GUI mode
+
+  - Braille handling
+
+  - Allow converting tt++ scripts to C.
+
+  - session proxies
+
+--------------------------------------------------------------------------------
+
+* STUFF THAT MIGHT BE IMPLEMENTED
+
+  - ability to #read entire directories.
+
+  - fix ctrl-r ctrl-d / ctrl-c / enter
+
+  - Option to run #script in background.
+
+  - Make &0 to &99 local.
+
+  - Color compression (already partial support)
+
+  - SGA disabling
+
+  - BINARY TELOPT support.
+
+  - add #line gag {lines} option
+
+  - Add something like #log append $dir/logs/log.txt {%D %H:%M:%S}
+
+  - compact map view mode http://tintin.sourceforge.net/board/viewtopic.php?p=9994
+
+  - https://github.com/eliukblau/pixterm
+
+--------------------------------------------------------------------------------
+
+
+* BUGS THAT NEED FIXING
+
+  - Word wrap related scroll back problems.
+
+  - Crash on multiple session close
+
+  - \x7B\x7D_____\x7B\x7D_ doesn't match in #regex.
+
+--------------------------------------------------------------------------------
+
+* BUGS THAT MIGHT NEED FIXING
+
+  - http://tintin.sourceforge.net/board/viewtopic.php?p=7124
+
+  - There's a bug with prompt repetitions with packet patch set.
+
+  - Deal with escaping { } / ; in #script variables.
+
+  - Make tintin char setting by session instead of global.
+
+  - #cr doesn't reset the packet patch state
+
+    + tintin.sourceforge.net/board/viewtopic.php?t=36
+
+--------------------------------------------------------------------------------
+
+
+* MAPPING
+
+  - add option to show party members on the map
+
+  - map where command that shows relative coordinates.
+
+  - Add better table support for data fields.
+
+  - auto adjust max vnum size of mapper.
+
+  - global flag to only show the same area with the mapper.
+
+  - Add something to indicate a non standard exit on the ASCII mapper.
+
+  - Display hidden exits differently.
+
+  - Better #map undo support using maybe timestamp, type, info.
+
+  - Add conditional if checks for room traversal.
+
+  - add highlight option
+
+  - Add #V version info
+
+--------------------------------------------------------------------------------
+
+* STUFF FOR A RAINY DAY
+
+- Fix up IPv6 support in port/chat.
+
+- Look into packet defragmentation for chat.
+
+- Look into using speech-dispatcher for text to speech.
+
+- Add %U (upper) %L (lower) support.
+  check https://www.boost.org/doc/libs/1_50_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
+
+- cursor extension for vim
+
+- interactive script tutorial
+
+-------------------------------------------------------------------------------
+
+* STUFF I'M NOT SURE ABOUT
+
+- Keep last input visible with repeat enter enabled.
+
+-------------------------------------------------------------------------------
+
+* STUFF THAT WON'T BE IMPLEMENTED
+
+- Lua or any other scripting language, focus is on developing tintin scripting.
+
+-------------------------------------------------------------------------------
+
+* ISSUES
+
+- TinTin++ only allows 1 action triggering per line.
+
+- TinTin++ probably should substitute escapes in if checks.
+
+- TinTin++ is not handling #return inside #regex intuitively.
