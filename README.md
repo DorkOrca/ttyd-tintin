@@ -210,12 +210,14 @@ sudo iptables -A DOCKER-USER -i docker0 -p udp --dport 123 -j ACCEPT
 
 # Allow outbound connections to specific IP ranges and ports
 # Customize these for your MUD server(s)
+# in this example the 76.17.0.0 is the docker subnets being used
 sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4000 -j ACCEPT
 sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4001 -j ACCEPT
 sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 76.17.0.0/16 --dport 4002 -j ACCEPT
-sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4000 -j ACCEPT
-sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4001 -j ACCEPT
-sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.12.100 --dport 4002 -j ACCEPT
+# in this example the 10.0.1.100 is the ip address where the mud lives
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.1.100 --dport 4000 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.1.100 --dport 4001 -j ACCEPT
+sudo iptables -A DOCKER-USER -i docker0 -p tcp -d 10.0.1.100 --dport 4002 -j ACCEPT
 
 # Drop all other outbound traffic from docker0
 sudo iptables -A DOCKER-USER -i docker0 -j DROP
