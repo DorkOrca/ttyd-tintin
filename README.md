@@ -21,15 +21,34 @@ A containerized web wrapper around [TinTin++](https://tintin.mudhalla.net), prov
    docker build -t tintin-web .
    ```
 
-2. **Run the container:**
+2. **Create directories for persistent data:**
    ```bash
-   docker run -p 80:7681 tintin-web
+   mkdir -p /path/to/tintinData /path/to/tintinLogs
    ```
 
-3. **Access the client:**
+3. **Run the container:**
+   ```bash
+   docker run -d --restart unless-stopped \
+     -p 80:80 \
+     -v /path/to/tintinData:/app/data \
+     -v /path/to/tintinLogs:/app/logs \
+     tintin-web
+   ```
+
+   | Flag | Purpose |
+   |------|---------|
+   | `-d` | Run in background (detached) |
+   | `--restart unless-stopped` | Auto-restart on reboot/crash |
+   | `-p 80:80` | Map port 80 to host |
+   | `-v .../tintinData:/app/data` | Persist user database and configs |
+   | `-v .../tintinLogs:/app/logs` | Persist log files |
+
+   **Important:** Mount `/app/data` and `/app/logs` to host directories to preserve user accounts and configurations when rebuilding the container.
+
+4. **Access the client:**
    Open your browser to `http://localhost/`
 
-4. **Register/Login:**
+5. **Register/Login:**
    Create an account or log in to access your TinTin++ session.
 
 ## Customization
