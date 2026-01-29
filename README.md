@@ -89,26 +89,6 @@ The `defaultConfig` file uses TinTin++ scripting syntax:
 
 Full documentation: https://tintin.mudhalla.net/manual/
 
-## Building TinTin++ from Source
-
-If you need to modify TinTin++ itself:
-
-```bash
-cd tt/src
-./configure
-make
-sudo make install
-```
-
-**Clean build artifacts:**
-```bash
-cd tt/src
-make clean       # Remove .o files and binary
-make distclean   # Also remove generated Makefiles and config
-```
-
-**Build dependencies:** libpcre3, zlib1g, libncurses5/w, gnutls
-
 ## Architecture
 
 ### Container Components
